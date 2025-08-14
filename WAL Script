@@ -152,9 +152,6 @@ local Slider = PlayerTab:CreateSlider({
             player.CameraMaxZoomLoop:Destroy()
         end
 
-        -- Only start loop if Value >= 15
-        if Value < 15 then return end
-
         -- Create loop holder
         local loopFlag = Instance.new("BoolValue")
         loopFlag.Name = "CameraMaxZoomLoop"
@@ -163,14 +160,13 @@ local Slider = PlayerTab:CreateSlider({
         -- Start loop
         task.spawn(function()
             while loopFlag.Parent do
-                player.CameraMaxZoomDistance = Value
-
-                -- Stop loop if Value drops below 15
                 if Value < 15 then
+                    player.CameraMaxZoomDistance = 15
                     loopFlag:Destroy()
                     break
+                else
+                    player.CameraMaxZoomDistance = Value
                 end
-
                 task.wait(0.01)
             end
         end)
