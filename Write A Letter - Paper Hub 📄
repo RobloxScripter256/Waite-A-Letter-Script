@@ -56,6 +56,11 @@ local player = game.Players.LocalPlayer
 
 --Local Player Functions
 
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local Label = PlayerTab:CreateLabel("We Use Loop Jump For Bypass Anti-Cheat Speed Changing. (Value 10 To Stop)", 4483362458, Color3.fromRGB(255, 205, 220), false)
+
 local Slider = PlayerTab:CreateSlider({
 	Name = "Walkspeed",
 	Range = {10, 100},
@@ -69,17 +74,24 @@ local Slider = PlayerTab:CreateSlider({
 			player.WalkSpeedLoop:Destroy()
 		end
 
-		-- Create a new loop holder so we can stop it later
+		-- Create a new loop flag
 		local loopFlag = Instance.new("BoolValue")
 		loopFlag.Name = "WalkSpeedLoop"
 		loopFlag.Parent = player
 
-		-- Gradually adjust speed until we hit 18
+		-- Gradually adjust speed + make player jump until reaching 18
 		task.spawn(function()
 			while loopFlag.Parent and Value ~= 18 do
-				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+				local char = player.Character
+				local humanoid = char and char:FindFirstChildOfClass("Humanoid")
 				if humanoid then
+					-- Set WalkSpeed
 					humanoid.WalkSpeed = Value
+					
+					-- Make the player jump
+					if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
+						humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+					end
 				end
 				task.wait(0.00001)
 			end
@@ -88,26 +100,14 @@ local Slider = PlayerTab:CreateSlider({
 })
 
 local Slider = PlayerTab:CreateSlider({
-	Name = "JetPack Speed",
-	Range = {5, 100},
+	Name = "Jump Height",
+	Range = {4.5, 50},
 	Increment = 1,
-	Suffix = "Max Jetpack Speed",
-	CurrentValue = 5,
-	Flag = "Slider2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	Callback = function(Value)
-		game.Players.LocalPlayer:SetAttribute("jetpackSpeed", Value)
-	end,
-})
-
-local Slider = PlayerTab:CreateSlider({
-	Name = "Jump Power",
-	Range = {50, 400},
-	Increment = 1,
-	Suffix = "Current Jump Power",
-	CurrentValue = 50,
+	Suffix = "Current Jump Height",
+	CurrentValue = 4.5,
 	Flag = "Slider3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
-		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = Value
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpHeight = Value
 	end,
 })
 
