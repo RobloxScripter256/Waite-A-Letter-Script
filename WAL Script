@@ -1,0 +1,458 @@
+local allowedPlaceIds = {
+	8425637426, -- Replace with the allowed PlaceId(s)
+}
+
+if not table.find(allowedPlaceIds, game.PlaceId) then
+	warn("This script is not allowed in this place.")
+	return -- stops the script from continuing
+end
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+	Name = "Write A Letter - Paper Hub 📄",
+	Icon = 17104625041, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+	LoadingTitle = "Paper Hub v0.1",
+	LoadingSubtitle = "by Dev_Smiley",
+	ShowText = "Paper Hub 📄", -- for mobile users to unhide rayfield, change if you'd like
+	Theme = "Amethyst", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+	ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
+
+	DisableRayfieldPrompts = false,
+	DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = nil, -- Create a custom folder for your hub/game
+		FileName = "Big Hub"
+	},
+
+	Discord = {
+		Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+		Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
+		RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+	},
+
+	KeySystem = false, -- Set this to true to use our key system
+	KeySettings = {
+		Title = "Untitled",
+		Subtitle = "Key System",
+		Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
+		FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+		SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+		GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+		Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+	}
+})
+
+local PlayerTab = Window:CreateTab("LocalPlayer", 4483362458) -- Title, Image
+local ESPTab = Window:CreateTab("ESP", 4483362458) -- Title, Image
+local CSettingsTab = Window:CreateTab("Client Settings", 4483362458) -- Title, Image
+
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+local player = game.Players.LocalPlayer
+
+--Local Player Functions
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
+
+local Slider = PlayerTab:CreateSlider({
+	Name = "Walkspeed",
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = "Speed",
+	CurrentValue = 10,
+	Flag = "Slider1",
+	Callback = function(Value)
+		-- Stop any previous loop
+		if player:FindFirstChild("WalkSpeedLoop") then
+			player.WalkSpeedLoop:Destroy()
+		end
+
+		-- Create a new loop holder so we can stop it later
+		local loopFlag = Instance.new("BoolValue")
+		loopFlag.Name = "WalkSpeedLoop"
+		loopFlag.Parent = player
+
+		-- Gradually adjust speed until we hit 18
+		task.spawn(function()
+			while loopFlag.Parent and Value ~= 18 do
+				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+				if humanoid then
+					humanoid.WalkSpeed = Value
+				end
+				task.wait(0.00001)
+			end
+		end)
+	end,
+})
+
+local Slider = PlayerTab:CreateSlider({
+	Name = "JumpHeight",
+	Range = {0, 50},
+	Increment = 1,
+	Suffix = "Total Max Height",
+	CurrentValue = 4.5,
+	Flag = "Slider2",
+	Callback = function(Value)
+		-- Stop any previous loop
+		if player:FindFirstChild("JumpHeightLoop") then
+			player.JumpHeightLoop:Destroy()
+		end
+
+		-- Create a new loop holder so we can stop it later
+		local loopFlag = Instance.new("BoolValue")
+		loopFlag.Name = "JumpHeightLoop"
+		loopFlag.Parent = player
+
+		-- Gradually adjust speed until we hit 4.5
+		task.spawn(function()
+			while loopFlag.Parent and Value ~= 18 do
+				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+				if humanoid then
+						humanoid.JumpHeight = Value
+				end
+				task.wait(0.00001)
+			end
+		end)
+	end,
+})
+
+local Slider = PlayerTab:CreateSlider({
+	Name = "Hip Height",
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = "Current Hip Height",
+	CurrentValue = 0,
+	Flag = "Slider4", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").HipHeight = Value
+	end,
+})
+
+--Toggle Buttons For Boolens
+local Button = PlayerTab:CreateButton({
+	Name = "Sit Player",
+	Callback = function()
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit = true-- The function that takes place when the button is pressed
+	end,
+})
+
+local Button = PlayerTab:CreateButton({
+	Name = "Reset",
+	Callback = function()
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0-- The function that takes place when the button is pressed
+	end,
+})
+
+----------------------------------------------------------------------------------------------------------------------------------------
+--ESP Functions
+
+local Toggle = ESPTab:CreateToggle({
+	Name = "SnowHouseKeys ESP",
+	CurrentValue = false,
+	Flag = "SnowHouseKeysESP",
+	Callback = (function()
+		local snowHouseFolder = workspace:WaitForChild("Pickups"):WaitForChild("SnowHouseKeys")
+		local addedBillboards = {}
+		local connections = {}
+
+		local function addBillboard(part)
+			if not part:IsA("BasePart") or addedBillboards[part] then return end
+
+			local billboard = Instance.new("BillboardGui")
+			billboard.Name = "SnowKeyBillboard"
+			billboard.Adornee = part
+			billboard.Size = UDim2.new(0, 50, 0, 25)
+			billboard.AlwaysOnTop = true
+			billboard.Parent = part
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = part.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.new(173, 216, 23)
+			textLabel.Parent = billboard
+
+			addedBillboards[part] = billboard
+		end
+
+		local function removeBillboards()
+			for part, billboard in pairs(addedBillboards) do
+				if billboard and billboard.Parent then
+					billboard:Destroy()
+				end
+			end
+			table.clear(addedBillboards)
+
+			for _, conn in ipairs(connections) do
+				conn:Disconnect()
+			end
+			table.clear(connections)
+		end
+
+		return function(Value)
+			if Value then
+				-- Add ESP to all current parts
+				for _, part in ipairs(snowHouseFolder:GetDescendants()) do
+					if part:IsA("BasePart") then
+						addBillboard(part)
+					end
+				end
+
+				-- Listen for new parts
+				table.insert(connections, snowHouseFolder.DescendantAdded:Connect(function(desc)
+					if desc:IsA("BasePart") then
+						addBillboard(desc)
+					end
+				end))
+
+				-- Clean up billboards if parts are removed
+				table.insert(connections, snowHouseFolder.DescendantRemoving:Connect(function(desc)
+					if addedBillboards[desc] then
+						addedBillboards[desc]:Destroy()
+						addedBillboards[desc] = nil
+					end
+				end))
+			else
+				removeBillboards()
+			end
+		end
+	end)()
+})
+
+local Toggle = ESPTab:CreateToggle({
+	Name = "TrowelPickups ESP",
+	CurrentValue = false,
+	Flag = "TrowelPickupsESP",
+	Callback = (function()
+		local trowelFolder = workspace:WaitForChild("Pickups"):WaitForChild("TrowelPickups")
+		local addedBillboards = {}
+		local connections = {}
+
+		local function getModelAdornee(model)
+			if model:IsA("Model") then
+				if model.PrimaryPart then
+					return model.PrimaryPart
+				else
+					-- Find first BasePart in the model
+					return model:FindFirstChildWhichIsA("BasePart")
+				end
+			end
+			return nil
+		end
+
+		local function addBillboardToModel(model)
+			if not model:IsA("Model") or addedBillboards[model] then return end
+			local adornee = getModelAdornee(model)
+			if not adornee then return end
+
+			local billboard = Instance.new("BillboardGui")
+			billboard.Name = "TrowelBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 50, 0, 25)
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = model.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.new(173, 216, 23)
+			textLabel.Parent = billboard
+
+			addedBillboards[model] = billboard
+		end
+
+		local function removeBillboards()
+			for model, billboard in pairs(addedBillboards) do
+				if billboard and billboard.Parent then
+					billboard:Destroy()
+				end
+			end
+			table.clear(addedBillboards)
+
+			for _, conn in ipairs(connections) do
+				conn:Disconnect()
+			end
+			table.clear(connections)
+		end
+
+		return function(Value)
+			if Value then
+				-- Add to existing models
+				for _, child in ipairs(trowelFolder:GetChildren()) do
+					if child:IsA("Model") then
+						addBillboardToModel(child)
+					end
+				end
+
+				-- Detect new models
+				table.insert(connections, trowelFolder.ChildAdded:Connect(function(child)
+					if child:IsA("Model") then
+						addBillboardToModel(child)
+					end
+				end))
+
+				-- Remove billboard if model is deleted
+				table.insert(connections, trowelFolder.ChildRemoved:Connect(function(child)
+					if addedBillboards[child] then
+						addedBillboards[child]:Destroy()
+						addedBillboards[child] = nil
+					end
+				end))
+			else
+				removeBillboards()
+			end
+		end
+	end)()
+})
+
+local Toggle = ESPTab:CreateToggle({
+	Name = "Candle ESP",
+	CurrentValue = false,
+	Flag = "CandleESP",
+	Callback = (function()
+		local pickupsFolder = workspace:WaitForChild("Pickups")
+		local candleModel = pickupsFolder:WaitForChild("Candle")
+		local billboard
+
+		local function addBillboard()
+			if billboard then return end
+			local adornee = candleModel.PrimaryPart or candleModel:FindFirstChildWhichIsA("BasePart")
+			if not adornee then return end
+
+			billboard = Instance.new("BillboardGui")
+			billboard.Name = "CandleBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 50, 0, 25)
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = candleModel.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.fromRGB(173, 216, 23) -- Light purple
+			textLabel.Parent = billboard
+		end
+
+		local function removeBillboard()
+			if billboard and billboard.Parent then
+				billboard:Destroy()
+				billboard = nil
+			end
+		end
+
+		return function(Value)
+			if Value then
+				addBillboard()
+			else
+				removeBillboard()
+			end
+		end
+})
+
+-- Hammer ESP Toggle
+local HammerToggle = ESPTab:CreateToggle({
+	Name = "Hammer ESP",
+	CurrentValue = false,
+	Flag = "HammerESP",
+	Callback = (function()
+		local pickupsFolder = workspace:WaitForChild("Pickups")
+		local hammerModel = pickupsFolder:WaitForChild("Hammer")
+		local billboard
+
+		local function addBillboard()
+			if billboard then return end
+			local adornee = hammerModel.PrimaryPart or hammerModel:FindFirstChildWhichIsA("BasePart")
+			if not adornee then return end
+
+			billboard = Instance.new("BillboardGui")
+			billboard.Name = "HammerBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 50, 0, 25) -- increased size
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = hammerModel.Name .. "-Code:1234"
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.fromRGB(173, 216, 230) -- light blue
+			textLabel.Parent = billboard
+		end
+
+		local function removeBillboard()
+			if billboard and billboard.Parent then
+				billboard:Destroy()
+				billboard = nil
+			end
+		end
+
+		return function(Value)
+			if Value then
+				addBillboard()
+			else
+				removeBillboard()
+			end
+		end
+	end)()
+})
+
+-- Pouch ESP Toggle
+local PouchToggle = ESPTab:CreateToggle({
+	Name = "Pouch ESP",
+	CurrentValue = false,
+	Flag = "PouchESP",
+	Callback = (function()
+		local pickupsFolder = workspace:WaitForChild("Pickups")
+		local pouchModel = pickupsFolder:WaitForChild("Pouch")
+		local billboard
+
+		local function addBillboard()
+			if billboard then return end
+			local adornee = pouchModel.PrimaryPart or pouchModel:FindFirstChildWhichIsA("BasePart")
+			if not adornee then return end
+
+			billboard = Instance.new("BillboardGui")
+			billboard.Name = "PouchBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 50, 0, 25) -- increased size
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = pouchModel.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.fromRGB(200, 162, 200) -- light purple
+			textLabel.Parent = billboard
+		end
+
+		local function removeBillboard()
+			if billboard and billboard.Parent then
+				billboard:Destroy()
+				billboard = nil
+			end
+		end
+
+		return function(Value)
+			if Value then
+				addBillboard()
+			else
+				removeBillboard()
+			end
+		end
+	end)()
+})
