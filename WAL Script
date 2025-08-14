@@ -49,6 +49,7 @@ local Window = Rayfield:CreateWindow({
 local PlayerTab = Window:CreateTab("LocalPlayer", 4483362458) -- Title, Image
 local ESPTab = Window:CreateTab("ESP", 4483362458) -- Title, Image
 local CSettingsTab = Window:CreateTab("Client Settings", 4483362458) -- Title, Image
+local BadgeTpTab = Window:CreateTab("Badges", 4483362458)
 
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
@@ -531,5 +532,116 @@ local NoFogButton = CSettingsTab:CreateButton({
 		Lighting.FogEnd = math.huge
 		Lighting.FogStart = math.huge
 	end
+})
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+local Label = BadgeTpTab:CreateLabel("Badge Teleport", 4483362458, Color3.fromRGB(200, 162, 200), false)
+
+-- Button 1: Cafe
+BadgeTpTab:CreateButton({
+    Name = "Cafe Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("Cafe")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 2: CafeSecretRoom
+BadgeTpTab:CreateButton({
+    Name = "CafeSecretRoom Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("CafeSecretRoom")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 3: FrozenLake
+BadgeTpTab:CreateButton({
+    Name = "FrozenLake Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("FrozenLake")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 4: Metro
+BadgeTpTab:CreateButton({
+    Name = "Metro Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("Metro")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 5: PinkRoom
+BadgeTpTab:CreateButton({
+    Name = "PinkRoom Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("PinkRoom")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 6: RoundClock
+BadgeTpTab:CreateButton({
+    Name = "RoundClock Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("RoundClock")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 7: SnowHouse
+BadgeTpTab:CreateButton({
+    Name = "SnowHouse Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("SnowHouse")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 8: SnowHouseSecretRoom
+BadgeTpTab:CreateButton({
+    Name = "SnowHouseSecretRoom Badge Teleport",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local part = workspace.BadgeTriggers:WaitForChild("SnowHouseSecretRoom")
+        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+    end
+})
+
+-- Button 9: Get All Badges
+BadgeTpTab:CreateButton({
+    Name = "Get All Badges",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        local originalCFrame = hrp.CFrame
+        
+        local badgeParts = {
+            workspace.BadgeTriggers:WaitForChild("Cafe"),
+            workspace.BadgeTriggers:WaitForChild("CafeSecretRoom"),
+            workspace.BadgeTriggers:WaitForChild("FrozenLake"),
+            workspace.BadgeTriggers:WaitForChild("Metro"),
+            workspace.BadgeTriggers:WaitForChild("PinkRoom"),
+            workspace.BadgeTriggers:WaitForChild("RoundClock"),
+            workspace.BadgeTriggers:WaitForChild("SnowHouse"),
+            workspace.BadgeTriggers:WaitForChild("SnowHouseSecretRoom"),
+        }
+        
+        for _, part in ipairs(badgeParts) do
+            hrp.CFrame = part.CFrame
+            task.wait(0.25)
+        end
+        
+        hrp.CFrame = originalCFrame
+    end
 })
 
