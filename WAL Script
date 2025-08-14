@@ -137,30 +137,40 @@ local Slider = PlayerTab:CreateSlider({
 })
 
 local Slider = PlayerTab:CreateSlider({
-    Name = "Camera Height",
-    Range = {0, 1000},
+    Name = "Max Camera Zoom",
+    Range = {0, 10000},
     Increment = 1,
-    Suffix = "CameraOffset",
-    CurrentValue = 0,
-    Flag = "Slider4",
+    Suffix = "MaxZoom",
+    CurrentValue = 15,
+    Flag = "SliderCameraMaxZoom",
     Callback = function(Value)
-        -- Stop any previous loop
-        if player:FindFirstChild("CameraOffsetLoop") then
-            player.CameraOffsetLoop:Destroy()
+        local player = game.Players.LocalPlayer
+        if not player then return end
+
+        -- Stop previous loop if it exists
+        if player:FindFirstChild("CameraMaxZoomLoop") then
+            player.CameraMaxZoomLoop:Destroy()
         end
 
-        -- Create a new loop holder
+        -- Only start loop if Value >= 15
+        if Value < 15 then return end
+
+        -- Create loop holder
         local loopFlag = Instance.new("BoolValue")
-        loopFlag.Name = "CameraOffsetLoop"
+        loopFlag.Name = "CameraMaxZoomLoop"
         loopFlag.Parent = player
 
         -- Start loop
         task.spawn(function()
             while loopFlag.Parent do
-                local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.CameraOffset = Vector3.new(0, Value, 0)
+                player.CameraMaxZoomDistance = Value
+
+                -- Stop loop if Value drops below 15
+                if Value < 15 then
+                    loopFlag:Destroy()
+                    break
                 end
+
                 task.wait(0.01)
             end
         end)
@@ -172,13 +182,15 @@ local Toggle = PlayerTab:CreateToggle({
     CurrentValue = false,
     Flag = "NoClipCamera",
     Callback = function(Value)
-        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-        if not humanoid then return end
+        local player = game.Players.LocalPlayer
+        if not player then return end
 
         if Value then
-            humanoid.CameraOffset = Vector3.new(2.822e-42, 0, 0)
+            -- Camera can see through walls
+            player.DevCameraOcclusionMode = Enum.DevCameraOcclusionMode.Invisicam
         else
-            humanoid.CameraOffset = Vector3.new(0, 0, 0)
+            -- Normal camera collision
+            player.DevCameraOcclusionMode = Enum.DevCameraOcclusionMode.Zoom
         end
     end
 })
