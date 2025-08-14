@@ -59,7 +59,7 @@ local player = game.Players.LocalPlayer
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(255, 205, 220), false)
+local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
 
 local Slider = PlayerTab:CreateSlider({
 	Name = "Walkspeed",
@@ -342,6 +342,101 @@ local Toggle = ESPTab:CreateToggle({
 			textLabel.Text = candleModel.Name
 			textLabel.TextScaled = true
 			textLabel.TextColor3 = Color3.fromRGB(173, 216, 23) -- Light purple
+			textLabel.Parent = billboard
+		end
+
+		local function removeBillboard()
+			if billboard and billboard.Parent then
+				billboard:Destroy()
+				billboard = nil
+			end
+		end
+
+		return function(Value)
+			if Value then
+				addBillboard()
+			else
+				removeBillboard()
+			end
+		end
+})
+
+-- Hammer ESP Toggle
+local HammerToggle = ESPTab:CreateToggle({
+	Name = "Hammer ESP",
+	CurrentValue = false,
+	Flag = "HammerESP",
+	Callback = (function()
+		local pickupsFolder = workspace:WaitForChild("Pickups")
+		local hammerModel = pickupsFolder:WaitForChild("Hammer")
+		local billboard
+
+		local function addBillboard()
+			if billboard then return end
+			local adornee = hammerModel.PrimaryPart or hammerModel:FindFirstChildWhichIsA("BasePart")
+			if not adornee then return end
+
+			billboard = Instance.new("BillboardGui")
+			billboard.Name = "HammerBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 50, 0, 25) -- increased size
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = hammerModel.Name .. "-Code:1234"
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.fromRGB(173, 216, 230) -- light blue
+			textLabel.Parent = billboard
+		end
+
+		local function removeBillboard()
+			if billboard and billboard.Parent then
+				billboard:Destroy()
+				billboard = nil
+			end
+		end
+
+		return function(Value)
+			if Value then
+				addBillboard()
+			else
+				removeBillboard()
+			end
+		end
+	end)()
+})
+
+-- Pouch ESP Toggle
+local PouchToggle = ESPTab:CreateToggle({
+	Name = "Pouch ESP",
+	CurrentValue = false,
+	Flag = "PouchESP",
+	Callback = (function()
+		local pickupsFolder = workspace:WaitForChild("Pickups")
+		local pouchModel = pickupsFolder:WaitForChild("Pouch")
+		local billboard
+
+		local function addBillboard()
+			if billboard then return end
+			local adornee = pouchModel.PrimaryPart or pouchModel:FindFirstChildWhichIsA("BasePart")
+			if not adornee then return end
+
+			billboard = Instance.new("BillboardGui")
+			billboard.Name = "PouchBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 50, 0, 25) -- increased size
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = pouchModel.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.fromRGB(200, 162, 200) -- light purple
 			textLabel.Parent = billboard
 		end
 
