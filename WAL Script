@@ -149,310 +149,280 @@ local Button = PlayerTab:CreateButton({
 		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0-- The function that takes place when the button is pressed
 	end,
 })
-
 ----------------------------------------------------------------------------------------------------------------------------------------
 --ESP Functions
 
+-- SnowHouseKeys ESP
 local Toggle = ESPTab:CreateToggle({
-	Name = "SnowHouseKeys ESP",
-	CurrentValue = false,
-	Flag = "SnowHouseKeysESP",
-	Callback = (function()
-		local snowHouseFolder = workspace:WaitForChild("Pickups"):WaitForChild("SnowHouseKeys")
-		local addedBillboards = {}
-		local connections = {}
+    Name = "SnowHouseKeys ESP",
+    CurrentValue = false,
+    Flag = "SnowHouseKeysESP",
+    Callback = function(Value)
+        local snowHouseFolder = workspace:WaitForChild("Pickups"):WaitForChild("SnowHouseKeys")
+        local addedBillboards = {}
+        local connections = {}
 
-		local function addBillboard(part)
-			if not part:IsA("BasePart") or addedBillboards[part] then return end
+        local function addBillboard(part)
+            if not part:IsA("BasePart") or addedBillboards[part] then return end
 
-			local billboard = Instance.new("BillboardGui")
-			billboard.Name = "SnowKeyBillboard"
-			billboard.Adornee = part
-			billboard.Size = UDim2.new(0, 50, 0, 25)
-			billboard.AlwaysOnTop = true
-			billboard.Parent = part
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "SnowKeyBillboard"
+            billboard.Adornee = part
+            billboard.Size = UDim2.new(0, 50, 0, 25)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = part
 
-			local textLabel = Instance.new("TextLabel")
-			textLabel.Size = UDim2.new(1, 0, 1, 0)
-			textLabel.BackgroundTransparency = 1
-			textLabel.Text = part.Name
-			textLabel.TextScaled = true
-			textLabel.TextColor3 = Color3.new(173, 216, 23)
-			textLabel.Parent = billboard
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = part.Name
+            textLabel.TextScaled = true
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 23)
+            textLabel.Parent = billboard
 
-			addedBillboards[part] = billboard
-		end
+            addedBillboards[part] = billboard
+        end
 
-		local function removeBillboards()
-			for part, billboard in pairs(addedBillboards) do
-				if billboard and billboard.Parent then
-					billboard:Destroy()
-				end
-			end
-			table.clear(addedBillboards)
+        local function removeBillboards()
+            for part, billboard in pairs(addedBillboards) do
+                if billboard and billboard.Parent then
+                    billboard:Destroy()
+                end
+            end
+            table.clear(addedBillboards)
+            for _, conn in ipairs(connections) do
+                conn:Disconnect()
+            end
+            table.clear(connections)
+        end
 
-			for _, conn in ipairs(connections) do
-				conn:Disconnect()
-			end
-			table.clear(connections)
-		end
-
-		return function(Value)
-			if Value then
-				-- Add ESP to all current parts
-				for _, part in ipairs(snowHouseFolder:GetDescendants()) do
-					if part:IsA("BasePart") then
-						addBillboard(part)
-					end
-				end
-
-				-- Listen for new parts
-				table.insert(connections, snowHouseFolder.DescendantAdded:Connect(function(desc)
-					if desc:IsA("BasePart") then
-						addBillboard(desc)
-					end
-				end))
-
-				-- Clean up billboards if parts are removed
-				table.insert(connections, snowHouseFolder.DescendantRemoving:Connect(function(desc)
-					if addedBillboards[desc] then
-						addedBillboards[desc]:Destroy()
-						addedBillboards[desc] = nil
-					end
-				end))
-			else
-				removeBillboards()
-			end
-		end
-	end)()
+        if Value then
+            for _, part in ipairs(snowHouseFolder:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    addBillboard(part)
+                end
+            end
+            table.insert(connections, snowHouseFolder.DescendantAdded:Connect(function(desc)
+                if desc:IsA("BasePart") then addBillboard(desc) end
+            end))
+            table.insert(connections, snowHouseFolder.DescendantRemoving:Connect(function(desc)
+                if addedBillboards[desc] then
+                    addedBillboards[desc]:Destroy()
+                    addedBillboards[desc] = nil
+                end
+            end))
+        else
+            removeBillboards()
+        end
+    end
 })
 
+-- TrowelPickups ESP
 local Toggle = ESPTab:CreateToggle({
-	Name = "TrowelPickups ESP",
-	CurrentValue = false,
-	Flag = "TrowelPickupsESP",
-	Callback = (function()
-		local trowelFolder = workspace:WaitForChild("Pickups"):WaitForChild("TrowelPickups")
-		local addedBillboards = {}
-		local connections = {}
+    Name = "TrowelPickups ESP",
+    CurrentValue = false,
+    Flag = "TrowelPickupsESP",
+    Callback = function(Value)
+        local trowelFolder = workspace:WaitForChild("Pickups"):WaitForChild("TrowelPickups")
+        local addedBillboards = {}
+        local connections = {}
 
-		local function getModelAdornee(model)
-			if model:IsA("Model") then
-				if model.PrimaryPart then
-					return model.PrimaryPart
-				else
-					-- Find first BasePart in the model
-					return model:FindFirstChildWhichIsA("BasePart")
-				end
-			end
-			return nil
-		end
+        local function getModelAdornee(model)
+            if model:IsA("Model") then
+                return model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+            end
+            return nil
+        end
 
-		local function addBillboardToModel(model)
-			if not model:IsA("Model") or addedBillboards[model] then return end
-			local adornee = getModelAdornee(model)
-			if not adornee then return end
+        local function addBillboardToModel(model)
+            if not model:IsA("Model") or addedBillboards[model] then return end
+            local adornee = getModelAdornee(model)
+            if not adornee then return end
 
-			local billboard = Instance.new("BillboardGui")
-			billboard.Name = "TrowelBillboard"
-			billboard.Adornee = adornee
-			billboard.Size = UDim2.new(0, 50, 0, 25)
-			billboard.AlwaysOnTop = true
-			billboard.Parent = adornee
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "TrowelBillboard"
+            billboard.Adornee = adornee
+            billboard.Size = UDim2.new(0, 50, 0, 25)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = adornee
 
-			local textLabel = Instance.new("TextLabel")
-			textLabel.Size = UDim2.new(1, 0, 1, 0)
-			textLabel.BackgroundTransparency = 1
-			textLabel.Text = model.Name
-			textLabel.TextScaled = true
-			textLabel.TextColor3 = Color3.new(173, 216, 23)
-			textLabel.Parent = billboard
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = model.Name
+            textLabel.TextScaled = true
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 23)
+            textLabel.Parent = billboard
 
-			addedBillboards[model] = billboard
-		end
+            addedBillboards[model] = billboard
+        end
 
-		local function removeBillboards()
-			for model, billboard in pairs(addedBillboards) do
-				if billboard and billboard.Parent then
-					billboard:Destroy()
-				end
-			end
-			table.clear(addedBillboards)
+        local function removeBillboards()
+            for model, billboard in pairs(addedBillboards) do
+                if billboard and billboard.Parent then
+                    billboard:Destroy()
+                end
+            end
+            table.clear(addedBillboards)
+            for _, conn in ipairs(connections) do
+                conn:Disconnect()
+            end
+            table.clear(connections)
+        end
 
-			for _, conn in ipairs(connections) do
-				conn:Disconnect()
-			end
-			table.clear(connections)
-		end
-
-		return function(Value)
-			if Value then
-				-- Add to existing models
-				for _, child in ipairs(trowelFolder:GetChildren()) do
-					if child:IsA("Model") then
-						addBillboardToModel(child)
-					end
-				end
-
-				-- Detect new models
-				table.insert(connections, trowelFolder.ChildAdded:Connect(function(child)
-					if child:IsA("Model") then
-						addBillboardToModel(child)
-					end
-				end))
-
-				-- Remove billboard if model is deleted
-				table.insert(connections, trowelFolder.ChildRemoved:Connect(function(child)
-					if addedBillboards[child] then
-						addedBillboards[child]:Destroy()
-						addedBillboards[child] = nil
-					end
-				end))
-			else
-				removeBillboards()
-			end
-		end
-	end)()
+        if Value then
+            for _, child in ipairs(trowelFolder:GetChildren()) do
+                if child:IsA("Model") then addBillboardToModel(child) end
+            end
+            table.insert(connections, trowelFolder.ChildAdded:Connect(function(child)
+                if child:IsA("Model") then addBillboardToModel(child) end
+            end))
+            table.insert(connections, trowelFolder.ChildRemoved:Connect(function(child)
+                if addedBillboards[child] then
+                    addedBillboards[child]:Destroy()
+                    addedBillboards[child] = nil
+                end
+            end))
+        else
+            removeBillboards()
+        end
+    end
 })
 
-local Toggle = ESPTab:CreateToggle({
-	Name = "Candle ESP",
-	CurrentValue = false,
-	Flag = "CandleESP",
-	Callback = (function()
-		local pickupsFolder = workspace:WaitForChild("Pickups")
-		local candleModel = pickupsFolder:WaitForChild("Candle")
-		local billboard
+-- Candle ESP
+local CandleToggle = ESPTab:CreateToggle({
+    Name = "Candle ESP",
+    CurrentValue = false,
+    Flag = "CandleESP",
+    Callback = function(Value)
+        local pickupsFolder = workspace:WaitForChild("Pickups")
+        local candleModel = pickupsFolder:WaitForChild("Candle")
+        local billboard
 
-		local function addBillboard()
-			if billboard then return end
-			local adornee = candleModel.PrimaryPart or candleModel:FindFirstChildWhichIsA("BasePart")
-			if not adornee then return end
+        local function addBillboard()
+            if billboard then return end
+            local adornee = candleModel.PrimaryPart or candleModel:FindFirstChildWhichIsA("BasePart")
+            if not adornee then return end
 
-			billboard = Instance.new("BillboardGui")
-			billboard.Name = "CandleBillboard"
-			billboard.Adornee = adornee
-			billboard.Size = UDim2.new(0, 50, 0, 25)
-			billboard.AlwaysOnTop = true
-			billboard.Parent = adornee
+            billboard = Instance.new("BillboardGui")
+            billboard.Name = "CandleBillboard"
+            billboard.Adornee = adornee
+            billboard.Size = UDim2.new(0, 50, 0, 25)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = adornee
 
-			local textLabel = Instance.new("TextLabel")
-			textLabel.Size = UDim2.new(1, 0, 1, 0)
-			textLabel.BackgroundTransparency = 1
-			textLabel.Text = candleModel.Name
-			textLabel.TextScaled = true
-			textLabel.TextColor3 = Color3.fromRGB(173, 216, 23) -- Light purple
-			textLabel.Parent = billboard
-		end
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = candleModel.Name
+            textLabel.TextScaled = true
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 23) -- light purple
+            textLabel.Parent = billboard
+        end
 
-		local function removeBillboard()
-			if billboard and billboard.Parent then
-				billboard:Destroy()
-				billboard = nil
-			end
-		end
+        local function removeBillboard()
+            if billboard and billboard.Parent then
+                billboard:Destroy()
+                billboard = nil
+            end
+        end
 
-		return function(Value)
-			if Value then
-				addBillboard()
-			else
-				removeBillboard()
-			end
-		end
+        if Value then
+            addBillboard()
+        else
+            removeBillboard()
+        end
+    end
 })
 
--- Hammer ESP Toggle
+-- Hammer ESP
 local HammerToggle = ESPTab:CreateToggle({
-	Name = "Hammer ESP",
-	CurrentValue = false,
-	Flag = "HammerESP",
-	Callback = (function()
-		local pickupsFolder = workspace:WaitForChild("Pickups")
-		local hammerModel = pickupsFolder:WaitForChild("Hammer")
-		local billboard
+    Name = "Hammer ESP",
+    CurrentValue = false,
+    Flag = "HammerESP",
+    Callback = function(Value)
+        local pickupsFolder = workspace:WaitForChild("Pickups")
+        local hammerModel = pickupsFolder:WaitForChild("Hammer")
+        local billboard
 
-		local function addBillboard()
-			if billboard then return end
-			local adornee = hammerModel.PrimaryPart or hammerModel:FindFirstChildWhichIsA("BasePart")
-			if not adornee then return end
+        local function addBillboard()
+            if billboard then return end
+            local adornee = hammerModel.PrimaryPart or hammerModel:FindFirstChildWhichIsA("BasePart")
+            if not adornee then return end
 
-			billboard = Instance.new("BillboardGui")
-			billboard.Name = "HammerBillboard"
-			billboard.Adornee = adornee
-			billboard.Size = UDim2.new(0, 50, 0, 25) -- increased size
-			billboard.AlwaysOnTop = true
-			billboard.Parent = adornee
+            billboard = Instance.new("BillboardGui")
+            billboard.Name = "HammerBillboard"
+            billboard.Adornee = adornee
+            billboard.Size = UDim2.new(0, 50, 0, 25)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = adornee
 
-			local textLabel = Instance.new("TextLabel")
-			textLabel.Size = UDim2.new(1, 0, 1, 0)
-			textLabel.BackgroundTransparency = 1
-			textLabel.Text = hammerModel.Name .. "-Code:1234"
-			textLabel.TextScaled = true
-			textLabel.TextColor3 = Color3.fromRGB(173, 216, 230) -- light blue
-			textLabel.Parent = billboard
-		end
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = hammerModel.Name .. "-Code:1234"
+            textLabel.TextScaled = true
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 230) -- light blue
+            textLabel.Parent = billboard
+        end
 
-		local function removeBillboard()
-			if billboard and billboard.Parent then
-				billboard:Destroy()
-				billboard = nil
-			end
-		end
+        local function removeBillboard()
+            if billboard and billboard.Parent then
+                billboard:Destroy()
+                billboard = nil
+            end
+        end
 
-		return function(Value)
-			if Value then
-				addBillboard()
-			else
-				removeBillboard()
-			end
-		end
-	end)()
+        if Value then
+            addBillboard()
+        else
+            removeBillboard()
+        end
+    end
 })
 
--- Pouch ESP Toggle
+-- Pouch ESP
 local PouchToggle = ESPTab:CreateToggle({
-	Name = "Pouch ESP",
-	CurrentValue = false,
-	Flag = "PouchESP",
-	Callback = (function()
-		local pickupsFolder = workspace:WaitForChild("Pickups")
-		local pouchModel = pickupsFolder:WaitForChild("Pouch")
-		local billboard
+    Name = "Pouch ESP",
+    CurrentValue = false,
+    Flag = "PouchESP",
+    Callback = function(Value)
+        local pickupsFolder = workspace:WaitForChild("Pickups")
+        local pouchModel = pickupsFolder:WaitForChild("Pouch")
+        local billboard
 
-		local function addBillboard()
-			if billboard then return end
-			local adornee = pouchModel.PrimaryPart or pouchModel:FindFirstChildWhichIsA("BasePart")
-			if not adornee then return end
+        local function addBillboard()
+            if billboard then return end
+            local adornee = pouchModel.PrimaryPart or pouchModel:FindFirstChildWhichIsA("BasePart")
+            if not adornee then return end
 
-			billboard = Instance.new("BillboardGui")
-			billboard.Name = "PouchBillboard"
-			billboard.Adornee = adornee
-			billboard.Size = UDim2.new(0, 50, 0, 25) -- increased size
-			billboard.AlwaysOnTop = true
-			billboard.Parent = adornee
+            billboard = Instance.new("BillboardGui")
+            billboard.Name = "PouchBillboard"
+            billboard.Adornee = adornee
+            billboard.Size = UDim2.new(0, 50, 0, 25)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = adornee
 
-			local textLabel = Instance.new("TextLabel")
-			textLabel.Size = UDim2.new(1, 0, 1, 0)
-			textLabel.BackgroundTransparency = 1
-			textLabel.Text = pouchModel.Name
-			textLabel.TextScaled = true
-			textLabel.TextColor3 = Color3.fromRGB(200, 162, 200) -- light purple
-			textLabel.Parent = billboard
-		end
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = pouchModel.Name
+            textLabel.TextScaled = true
+            textLabel.TextColor3 = Color3.fromRGB(200, 162, 200) -- light purple
+            textLabel.Parent = billboard
+        end
 
-		local function removeBillboard()
-			if billboard and billboard.Parent then
-				billboard:Destroy()
-				billboard = nil
-			end
-		end
+        local function removeBillboard()
+            if billboard and billboard.Parent then
+                billboard:Destroy()
+                billboard = nil
+            end
+        end
 
-		return function(Value)
-			if Value then
-				addBillboard()
-			else
-				removeBillboard()
-			end
-		end
-	end)()
+        if Value then
+            addBillboard()
+        else
+            removeBillboard()
+        end
+    end
 })
