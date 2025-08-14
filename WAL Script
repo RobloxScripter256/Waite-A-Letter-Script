@@ -62,7 +62,7 @@ local player = Players.LocalPlayer
 local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
 
 local Slider = PlayerTab:CreateSlider({
-	Name = "Walkspeed",
+	Name = "JumpSpeed",
 	Range = {0, 100},
 	Increment = 1,
 	Suffix = "Speed",
@@ -93,7 +93,7 @@ local Slider = PlayerTab:CreateSlider({
 })
 
 local Slider = PlayerTab:CreateSlider({
-	Name = "JumpHeight",
+	Name = "JumpHeight (Broken)",
 	Range = {0, 50},
 	Increment = 1,
 	Suffix = "Total Max Height",
