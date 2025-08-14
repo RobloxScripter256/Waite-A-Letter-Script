@@ -511,3 +511,25 @@ local PouchToggle = ESPTab:CreateToggle({
         end
     end
 })
+
+---------------------------------------------------------------------------------------------------------------------------------------
+local Label = CSettingsTab:CreateLabel("Lighting", 4483362458, Color3.fromRGB(200, 162, 200), false)
+
+local NoFogButton = CSettingsTab:CreateButton({
+	Name = "No Fog",
+	Callback = function()
+		local Lighting = game:GetService("Lighting")
+
+		-- Remove all Atmosphere objects anywhere in the game
+		for _, obj in ipairs(game:GetDescendants()) do
+			if obj:IsA("Atmosphere") then
+				obj:Destroy()
+			end
+		end
+
+		-- Set fog properties to remove fog effect
+		Lighting.FogEnd = math.huge
+		Lighting.FogStart = math.huge
+	end
+})
+
