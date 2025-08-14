@@ -62,35 +62,48 @@ local Camera = workspace.CurrentCamera
 
 local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
 
-local Slider = PlayerTab:CreateSlider({
-	Name = "JumpSpeed",
-	Range = {0, 100},
-	Increment = 1,
-	Suffix = "Speed",
-	CurrentValue = 10,
-	Flag = "Slider1",
-	Callback = function(Value)
-		-- Stop any previous loop
-		if player:FindFirstChild("WalkSpeedLoop") then
-			player.WalkSpeedLoop:Destroy()
-		end
+local Input = PlayerTab:CreateInput({
+    Name = "JumpSpeed",
+    CurrentValue = "10",
+    PlaceholderText = "Enter Jump Speed",
+    RemoveTextAfterFocusLost = false,
+    Flag = "JumpSpeedInput",
+    Callback = function(Text)
+        local player = game.Players.LocalPlayer
+        if not player then return end
 
-		-- Create a new loop holder so we can stop it later
-		local loopFlag = Instance.new("BoolValue")
-		loopFlag.Name = "WalkSpeedLoop"
-		loopFlag.Parent = player
+        -- Stop previous loop if exists
+        if player:FindFirstChild("JumpSpeedLoop") then
+            player.JumpSpeedLoop:Destroy()
+        end
 
-		-- Gradually adjust speed until we hit 18
-		task.spawn(function()
-			while loopFlag.Parent and Value ~= 18 do
-				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-				if humanoid then
-					humanoid.WalkSpeed = Value
-				end
-				task.wait(0.00001)
-			end
-		end)
-	end,
+        -- Convert input to number
+        local Value = tonumber(Text) or 10
+
+        -- If value below 10 or empty, set WalkSpeed to 10 and stop loop
+        if Value < 10 then
+            local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 10
+            end
+            return
+        end
+
+        -- Create loop to continuously set WalkSpeed
+        local loopFlag = Instance.new("BoolValue")
+        loopFlag.Name = "JumpSpeedLoop"
+        loopFlag.Parent = player
+
+        task.spawn(function()
+            while loopFlag.Parent do
+                local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.WalkSpeed = Value
+                end
+                task.wait(0.01)
+            end
+        end)
+    end,
 })
 
 local Slider = PlayerTab:CreateSlider({
@@ -99,7 +112,7 @@ local Slider = PlayerTab:CreateSlider({
 	Increment = 1,
 	Suffix = "Total Max Height",
 	CurrentValue = 4.5,
-	Flag = "Slider2",
+	Flag = "Slider1",
 	Callback = function(Value)
 		-- Stop any previous loop
 		if player:FindFirstChild("JumpHeightLoop") then
@@ -130,7 +143,7 @@ local Slider = PlayerTab:CreateSlider({
 	Increment = 1,
 	Suffix = "Current Hip Height",
 	CurrentValue = 0,
-	Flag = "Slider3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Slider2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
 		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").HipHeight = Value
 	end,
