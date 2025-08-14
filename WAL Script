@@ -265,7 +265,7 @@ local function removeTrowelBillboards()
 end
 
 local TrowelToggle = ESPTab:CreateToggle({
-    Name = "TrowelPickups ESP",
+    Name = "Trowel ESP",
     CurrentValue = false,
     Flag = "TrowelPickupsESP",
     Callback = function(Value)
