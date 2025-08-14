@@ -149,3 +149,81 @@ local Button = PlayerTab:CreateButton({
 		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0-- The function that takes place when the button is pressed
 	end,
 })
+
+----------------------------------------------------------------------------------------------------------------------------------------
+--ESP Functions
+
+local Toggle = ESPTab:CreateToggle({
+	Name = "SnowHouseKeys ESP",
+	CurrentValue = false,
+	Flag = "SnowHouseKeysESP",
+	Callback = (function()
+		local snowHouseFolder = workspace:WaitForChild("Pickups"):WaitForChild("SnowHouseKeys")
+		local addedBillboards = {}
+		local connections = {}
+
+		local function addBillboard(part)
+			if not part:IsA("BasePart") or addedBillboards[part] then return end
+
+			local billboard = Instance.new("BillboardGui")
+			billboard.Name = "SnowKeyBillboard"
+			billboard.Adornee = part
+			billboard.Size = UDim2.new(0, 10, 0, 25)
+			billboard.AlwaysOnTop = true
+			billboard.Parent = part
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = part.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.new(1, 1, 1)
+			textLabel.Parent = billboard
+
+			addedBillboards[part] = billboard
+		end
+
+		local function removeBillboards()
+			for part, billboard in pairs(addedBillboards) do
+				if billboard and billboard.Parent then
+					billboard:Destroy()
+				end
+			end
+			table.clear(addedBillboards)
+
+			for _, conn in ipairs(connections) do
+				conn:Disconnect()
+			end
+			table.clear(connections)
+		end
+
+		return function(Value)
+			if Value then
+				-- Add ESP to all current parts
+				for _, part in ipairs(snowHouseFolder:GetDescendants()) do
+					if part:IsA("BasePart") then
+						addBillboard(part)
+					end
+				end
+
+				-- Listen for new parts
+				table.insert(connections, snowHouseFolder.DescendantAdded:Connect(function(desc)
+					if desc:IsA("BasePart") then
+						addBillboard(desc)
+					end
+				end))
+
+				-- Clean up billboards if parts are removed
+				table.insert(connections, snowHouseFolder.DescendantRemoving:Connect(function(desc)
+					if addedBillboards[desc] then
+						addedBillboards[desc]:Destroy()
+						addedBillboards[desc] = nil
+					end
+				end))
+			else
+				removeBillboards()
+			end
+		end
+	end)()
+})
+
