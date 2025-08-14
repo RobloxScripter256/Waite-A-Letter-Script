@@ -58,6 +58,7 @@ local player = game.Players.LocalPlayer
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
 local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
 
@@ -129,10 +130,83 @@ local Slider = PlayerTab:CreateSlider({
 	Increment = 1,
 	Suffix = "Current Hip Height",
 	CurrentValue = 0,
-	Flag = "Slider4", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Slider3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
 		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").HipHeight = Value
 	end,
+})
+
+local Slider = PlayerTab:CreateSlider({
+    Name = "Max Zoom",
+    Range = {0, 500},
+    Increment = 1,
+    Suffix = "Current Zoom",
+    CurrentValue = 5,
+    Flag = "Slider4",
+    Callback = function(Value)
+        -- Stop any previous loop
+        if player:FindFirstChild("MaxCameraViewLoop") then
+            player.MaxCameraViewLoop:Destroy()
+        end
+
+        -- Create a new loop holder
+        local loopFlag = Instance.new("BoolValue")
+        loopFlag.Name = "MaxCameraViewLoop"
+        loopFlag.Parent = player
+
+        -- Start loop
+        task.spawn(function()
+            while loopFlag.Parent and Value ~= 5 do
+                local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    -- Set humanoid WalkSpeed to Value (optional, you had this in your code)
+                    humanoid.WalkSpeed = Value
+                end
+
+                -- Change Camera zoom limits
+                if Camera then
+                    Camera.CameraSubject = Camera.CameraSubject -- just in case
+                    Camera.CameraType = Enum.CameraType.Custom
+                    Camera.MinZoomDistance = Value
+                    Camera.MaxZoomDistance = Value
+                    Camera.FieldOfView = 70 -- keep FOV default, optional
+                end
+
+                -- Stop loop automatically if Value reaches 5
+                if Value == 5 then
+                    loopFlag:Destroy()
+                    break
+                end
+
+                task.wait(0.01)
+            end
+        end)
+    end,
+})
+
+local Toggle = PlayerTab:CreateToggle({
+    Name = "NoClip Camera",
+    CurrentValue = false,
+    Flag = "SeeThroughWalls",
+    Callback = function(Value)
+        local Camera = workspace.CurrentCamera
+        if not Camera then return end
+
+        if Value then
+            -- Allow seeing through everything by setting CanCollide false and Transparency 0 for walls? 
+            -- But better: use Camera's CameraSubject and CameraType to see through
+            Camera.CameraType = Enum.CameraType.Custom
+            Camera:GetPropertyChangedSignal("CameraSubject"):Connect(function() 
+                Camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid") or player.Character
+            end)
+            -- Force camera ignores terrain collision via Workspace.CurrentCamera.CFrame
+            Camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid") or player.Character
+        else
+            -- Restore normal camera
+            Camera.CameraType = Enum.CameraType.Custom
+            Camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid") or player.Character
+        end
+    end
 })
 
 --Toggle Buttons For Boolens
@@ -142,6 +216,7 @@ local Button = PlayerTab:CreateButton({
 		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit = true-- The function that takes place when the button is pressed
 	end,
 })
+
 
 local Button = PlayerTab:CreateButton({
 	Name = "Reset",
