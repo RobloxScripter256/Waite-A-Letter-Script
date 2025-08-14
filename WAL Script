@@ -544,7 +544,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("Cafe")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
@@ -554,7 +554,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("CafeSecretRoom")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
@@ -564,7 +564,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("FrozenLake")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
@@ -584,7 +584,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("PinkRoom")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
@@ -594,7 +594,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("RoundClock")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
@@ -604,7 +604,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("SnowHouse")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
@@ -614,7 +614,7 @@ BadgeTpTab:CreateButton({
     Callback = function()
         local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
         local part = workspace.BadgeTriggers:WaitForChild("SnowHouseSecretRoom")
-        hrp.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+        hrp.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     end
 })
 
