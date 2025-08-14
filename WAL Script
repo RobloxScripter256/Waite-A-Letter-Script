@@ -60,7 +60,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
-local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
+local Label = PlayerTab:CreateLabel("JumpSpeed Is Speed Which Is Same With WalkSpeed But Its Only Work When You Jump (Value 10 To Stop)", 4483362458, Color3.fromRGB(200, 162, 200), false)
 
 local Input = PlayerTab:CreateInput({
     Name = "JumpSpeed",
