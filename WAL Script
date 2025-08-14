@@ -50,6 +50,9 @@ local PlayerTab = Window:CreateTab("LocalPlayer", 4483362458) -- Title, Image
 local ESPTab = Window:CreateTab("ESP", 4483362458) -- Title, Image
 local CSettingsTab = Window:CreateTab("Client Settings", 4483362458) -- Title, Image
 local BadgeTpTab = Window:CreateTab("Badges", 4483362458)
+local LettersTab = Window:CreateTab("Letters", 4483362458)
+local TrollTab = Window:CreateTab("Trolls", 4483362458)
+
 
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
@@ -642,6 +645,22 @@ BadgeTpTab:CreateButton({
         end
         
         hrp.CFrame = originalCFrame
+    end
+})
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+local Label = LettersTab:CreateLabel("Letters", 4483362458, Color3.fromRGB(200, 162, 200), false)
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+local Label = TrollTab:CreateLabel("Trolls", 4483362458, Color3.fromRGB(200, 162, 200), false)
+
+TrollTab:CreateButton({
+    Name = "Goon ( Tool )",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-jerk-off-goon-28106"))()
     end
 })
 
