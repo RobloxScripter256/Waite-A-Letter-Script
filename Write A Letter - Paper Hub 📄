@@ -52,7 +52,7 @@ local CSettingsTab = Window:CreateTab("Client Settings", 4483362458) -- Title, I
 
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
-local player = Players.LocalPlayer
+local player = game.Players.LocalPlayer
 
 --Local Player Functions
 
