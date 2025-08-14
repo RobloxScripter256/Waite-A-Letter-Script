@@ -59,14 +59,14 @@ local player = game.Players.LocalPlayer
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-local Label = PlayerTab:CreateLabel("We Use Loop Jump For Bypass Anti-Cheat Speed Changing. (Value 10 To Stop)", 4483362458, Color3.fromRGB(255, 205, 220), false)
+local Label = PlayerTab:CreateLabel("You Must Loop Jump For Bypass Anti-Cheat Speed Changing. (Value 10 To Stop)", 4483362458, Color3.fromRGB(255, 205, 220), false)
 
 local Slider = PlayerTab:CreateSlider({
 	Name = "Walkspeed",
-	Range = {10, 100},
+	Range = {0, 100},
 	Increment = 1,
 	Suffix = "Speed",
-	CurrentValue = 0,
+	CurrentValue = 10,
 	Flag = "Slider1",
 	Callback = function(Value)
 		-- Stop any previous loop
@@ -74,24 +74,17 @@ local Slider = PlayerTab:CreateSlider({
 			player.WalkSpeedLoop:Destroy()
 		end
 
-		-- Create a new loop flag
+		-- Create a new loop holder so we can stop it later
 		local loopFlag = Instance.new("BoolValue")
 		loopFlag.Name = "WalkSpeedLoop"
 		loopFlag.Parent = player
 
-		-- Gradually adjust speed + make player jump until reaching 18
+		-- Gradually adjust speed until we hit 18
 		task.spawn(function()
 			while loopFlag.Parent and Value ~= 18 do
-				local char = player.Character
-				local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
 				if humanoid then
-					-- Set WalkSpeed
 					humanoid.WalkSpeed = Value
-					
-					-- Make the player jump
-					if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
-						humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-					end
 				end
 				task.wait(0.00001)
 			end
@@ -100,14 +93,33 @@ local Slider = PlayerTab:CreateSlider({
 })
 
 local Slider = PlayerTab:CreateSlider({
-	Name = "Jump Height",
-	Range = {4.5, 50},
+	Name = "JumpHeight",
+	Range = {0, 50},
 	Increment = 1,
-	Suffix = "Current Jump Height",
+	Suffix = "Total Max Height",
 	CurrentValue = 4.5,
-	Flag = "Slider3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Slider2",
 	Callback = function(Value)
-		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpHeight = Value
+		-- Stop any previous loop
+		if player:FindFirstChild("JumpHeightLoop") then
+			player.WalkSpeedLoop:Destroy()
+		end
+
+		-- Create a new loop holder so we can stop it later
+		local loopFlag = Instance.new("BoolValue")
+		loopFlag.Name = "JumpHeightLoop"
+		loopFlag.Parent = player
+
+		-- Gradually adjust speed until we hit 4.5
+		task.spawn(function()
+			while loopFlag.Parent and Value ~= 18 do
+				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+				if humanoid then
+						humanoid.JumpHeight = Value
+				end
+				task.wait(0.00001)
+			end
+		end)
 	end,
 })
 
