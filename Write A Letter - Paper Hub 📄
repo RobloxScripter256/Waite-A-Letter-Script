@@ -227,3 +227,90 @@ local Toggle = ESPTab:CreateToggle({
 	end)()
 })
 
+local Toggle = ESPTab:CreateToggle({
+	Name = "TrowelPickups ESP",
+	CurrentValue = false,
+	Flag = "TrowelPickupsESP",
+	Callback = (function()
+		local trowelFolder = workspace:WaitForChild("Pickups"):WaitForChild("TrowelPickups")
+		local addedBillboards = {}
+		local connections = {}
+
+		local function getModelAdornee(model)
+			if model:IsA("Model") then
+				if model.PrimaryPart then
+					return model.PrimaryPart
+				else
+					-- Find first BasePart in the model
+					return model:FindFirstChildWhichIsA("BasePart")
+				end
+			end
+			return nil
+		end
+
+		local function addBillboardToModel(model)
+			if not model:IsA("Model") or addedBillboards[model] then return end
+			local adornee = getModelAdornee(model)
+			if not adornee then return end
+
+			local billboard = Instance.new("BillboardGui")
+			billboard.Name = "TrowelBillboard"
+			billboard.Adornee = adornee
+			billboard.Size = UDim2.new(0, 10, 0, 25)
+			billboard.AlwaysOnTop = true
+			billboard.Parent = adornee
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Text = model.Name
+			textLabel.TextScaled = true
+			textLabel.TextColor3 = Color3.new(1, 1, 1)
+			textLabel.Parent = billboard
+
+			addedBillboards[model] = billboard
+		end
+
+		local function removeBillboards()
+			for model, billboard in pairs(addedBillboards) do
+				if billboard and billboard.Parent then
+					billboard:Destroy()
+				end
+			end
+			table.clear(addedBillboards)
+
+			for _, conn in ipairs(connections) do
+				conn:Disconnect()
+			end
+			table.clear(connections)
+		end
+
+		return function(Value)
+			if Value then
+				-- Add to existing models
+				for _, child in ipairs(trowelFolder:GetChildren()) do
+					if child:IsA("Model") then
+						addBillboardToModel(child)
+					end
+				end
+
+				-- Detect new models
+				table.insert(connections, trowelFolder.ChildAdded:Connect(function(child)
+					if child:IsA("Model") then
+						addBillboardToModel(child)
+					end
+				end))
+
+				-- Remove billboard if model is deleted
+				table.insert(connections, trowelFolder.ChildRemoved:Connect(function(child)
+					if addedBillboards[child] then
+						addedBillboards[child]:Destroy()
+						addedBillboards[child] = nil
+					end
+				end))
+			else
+				removeBillboards()
+			end
+		end
+	end)()
+})
