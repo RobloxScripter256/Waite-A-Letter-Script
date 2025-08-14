@@ -137,47 +137,30 @@ local Slider = PlayerTab:CreateSlider({
 })
 
 local Slider = PlayerTab:CreateSlider({
-    Name = "Max Zoom",
-    Range = {0, 500},
+    Name = "Camera Height",
+    Range = {0, 1000},
     Increment = 1,
-    Suffix = "Current Zoom",
-    CurrentValue = 5,
+    Suffix = "CameraOffset",
+    CurrentValue = 0,
     Flag = "Slider4",
     Callback = function(Value)
         -- Stop any previous loop
-        if player:FindFirstChild("MaxCameraViewLoop") then
-            player.MaxCameraViewLoop:Destroy()
+        if player:FindFirstChild("CameraOffsetLoop") then
+            player.CameraOffsetLoop:Destroy()
         end
 
         -- Create a new loop holder
         local loopFlag = Instance.new("BoolValue")
-        loopFlag.Name = "MaxCameraViewLoop"
+        loopFlag.Name = "CameraOffsetLoop"
         loopFlag.Parent = player
 
         -- Start loop
         task.spawn(function()
-            while loopFlag.Parent and Value ~= 5 do
+            while loopFlag.Parent do
                 local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
                 if humanoid then
-                    -- Set humanoid WalkSpeed to Value (optional, you had this in your code)
-                    humanoid.WalkSpeed = Value
+                    humanoid.CameraOffset = Vector3.new(0, Value, 0)
                 end
-
-                -- Change Camera zoom limits
-                if Camera then
-                    Camera.CameraSubject = Camera.CameraSubject -- just in case
-                    Camera.CameraType = Enum.CameraType.Custom
-                    Camera.MinZoomDistance = Value
-                    Camera.MaxZoomDistance = Value
-                    Camera.FieldOfView = 70 -- keep FOV default, optional
-                end
-
-                -- Stop loop automatically if Value reaches 5
-                if Value == 5 then
-                    loopFlag:Destroy()
-                    break
-                end
-
                 task.wait(0.01)
             end
         end)
@@ -187,24 +170,15 @@ local Slider = PlayerTab:CreateSlider({
 local Toggle = PlayerTab:CreateToggle({
     Name = "NoClip Camera",
     CurrentValue = false,
-    Flag = "SeeThroughWalls",
+    Flag = "NoClipCamera",
     Callback = function(Value)
-        local Camera = workspace.CurrentCamera
-        if not Camera then return end
+        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
 
         if Value then
-            -- Allow seeing through everything by setting CanCollide false and Transparency 0 for walls? 
-            -- But better: use Camera's CameraSubject and CameraType to see through
-            Camera.CameraType = Enum.CameraType.Custom
-            Camera:GetPropertyChangedSignal("CameraSubject"):Connect(function() 
-                Camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid") or player.Character
-            end)
-            -- Force camera ignores terrain collision via Workspace.CurrentCamera.CFrame
-            Camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid") or player.Character
+            humanoid.CameraOffset = Vector3.new(2.822e-42, 0, 0)
         else
-            -- Restore normal camera
-            Camera.CameraType = Enum.CameraType.Custom
-            Camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid") or player.Character
+            humanoid.CameraOffset = Vector3.new(0, 0, 0)
         end
     end
 })
