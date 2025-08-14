@@ -352,7 +352,7 @@ local function addHammerBillboard()
     local textLabel = Instance.new("TextLabel")
     textLabel.Size = UDim2.new(1, 0, 1, 0)
     textLabel.BackgroundTransparency = 1
-    textLabel.Text = hammerModel.Name .. "-Code:1234"
+    textLabel.Text = hammerModel.Name .. "-Code:7419"
     textLabel.TextScaled = true
     textLabel.TextColor3 = Color3.fromRGB(173, 216, 230)
     textLabel.Parent = hammerBillboard
