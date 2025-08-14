@@ -59,7 +59,7 @@ local player = game.Players.LocalPlayer
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-local Label = PlayerTab:CreateLabel("You Must Loop Jump For Bypass Anti-Cheat Speed Changing. (Value 10 To Stop)", 4483362458, Color3.fromRGB(255, 205, 220), false)
+local Label = PlayerTab:CreateLabel("WalkSpeed Only Work When You Jump Due To Anti-Cheat (Value 10 To Stop)", 4483362458, Color3.fromRGB(255, 205, 220), false)
 
 local Slider = PlayerTab:CreateSlider({
 	Name = "Walkspeed",
@@ -102,7 +102,7 @@ local Slider = PlayerTab:CreateSlider({
 	Callback = function(Value)
 		-- Stop any previous loop
 		if player:FindFirstChild("JumpHeightLoop") then
-			player.WalkSpeedLoop:Destroy()
+			player.JumpHeightLoop:Destroy()
 		end
 
 		-- Create a new loop holder so we can stop it later
