@@ -106,57 +106,73 @@ local Input = PlayerTab:CreateInput({
     end,
 })
 
-local Slider = PlayerTab:CreateSlider({
-	Name = "JumpHeight (Broken)",
-	Range = {0, 50},
-	Increment = 1,
-	Suffix = "Total Max Height",
-	CurrentValue = 4.5,
-	Flag = "Slider1",
-	Callback = function(Value)
-		-- Stop any previous loop
-		if player:FindFirstChild("JumpHeightLoop") then
-			player.JumpHeightLoop:Destroy()
-		end
+local Input = PlayerTab:CreateInput({
+    Name = "JumpHeight",
+    CurrentValue = "4.5",
+    PlaceholderText = "Enter Jump Height",
+    RemoveTextAfterFocusLost = false,
+    Flag = "JumpHeightInput",
+    Callback = function(Text)
+        local player = game.Players.LocalPlayer
+        if not player then return end
 
-		-- Create a new loop holder so we can stop it later
-		local loopFlag = Instance.new("BoolValue")
-		loopFlag.Name = "JumpHeightLoop"
-		loopFlag.Parent = player
+        -- Stop previous loop if exists
+        if player:FindFirstChild("JumpHeightLoop") then
+            player.JumpHeightLoop:Destroy()
+        end
 
-		-- Gradually adjust speed until we hit 4.5
-		task.spawn(function()
-			while loopFlag.Parent and Value ~= 18 do
-				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-				if humanoid then
-						humanoid.JumpHeight = Value
-				end
-				task.wait(0.00001)
-			end
-		end)
-	end,
+        -- Convert input to number
+        local Value = tonumber(Text) or 8
+
+        -- If value below 8 or empty, set JumpHeight to 8 and stop loop
+        if Value < 8 then
+            local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.JumpHeight = 8
+            end
+            return
+        end
+
+        -- Create loop to continuously set JumpHeight
+        local loopFlag = Instance.new("BoolValue")
+        loopFlag.Name = "JumpHeightLoop"
+        loopFlag.Parent = player
+
+        task.spawn(function()
+            while loopFlag.Parent do
+                local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.JumpHeight = Value
+                end
+                task.wait(0.01)
+            end
+        end)
+    end,
 })
 
-local Slider = PlayerTab:CreateSlider({
-	Name = "Hip Height",
-	Range = {0, 100},
-	Increment = 1,
-	Suffix = "Current Hip Height",
-	CurrentValue = 0,
-	Flag = "Slider2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	Callback = function(Value)
-		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").HipHeight = Value
-	end,
+local Input = PlayerTab:CreateInput({
+    Name = "Hip Height",
+    CurrentValue = "0",
+    PlaceholderText = "Enter Hip Height",
+    RemoveTextAfterFocusLost = false,
+    Flag = "HipHeightInput",
+    Callback = function(Text)
+        local player = game.Players.LocalPlayer
+        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+        local Value = tonumber(Text) or 0 -- default to 0 if empty or invalid
+        if humanoid then
+            humanoid.HipHeight = Value
+        end
+    end,
 })
 
-local Slider = PlayerTab:CreateSlider({
+local Input = PlayerTab:CreateInput({
     Name = "Max Camera Zoom",
-    Range = {0, 10000},
-    Increment = 1,
-    Suffix = "MaxZoom",
-    CurrentValue = 15,
-    Flag = "SliderCameraMaxZoom",
-    Callback = function(Value)
+    CurrentValue = "15",
+    PlaceholderText = "Enter Max Zoom",
+    RemoveTextAfterFocusLost = false,
+    Flag = "MaxCameraZoomInput",
+    Callback = function(Text)
         local player = game.Players.LocalPlayer
         if not player then return end
 
@@ -165,21 +181,24 @@ local Slider = PlayerTab:CreateSlider({
             player.CameraMaxZoomLoop:Destroy()
         end
 
+        -- Convert input to number
+        local Value = tonumber(Text) or 15
+
         -- Create loop holder
         local loopFlag = Instance.new("BoolValue")
         loopFlag.Name = "CameraMaxZoomLoop"
         loopFlag.Parent = player
 
-        -- Start loop
         task.spawn(function()
             while loopFlag.Parent do
+                -- Stop loop automatically if Value drops below 15
                 if Value < 15 then
                     player.CameraMaxZoomDistance = 15
                     loopFlag:Destroy()
                     break
-                else
-                    player.CameraMaxZoomDistance = Value
                 end
+
+                player.CameraMaxZoomDistance = Value
                 task.wait(0.01)
             end
         end)
