@@ -177,7 +177,7 @@ local Toggle = ESPTab:CreateToggle({
             textLabel.BackgroundTransparency = 1
             textLabel.Text = part.Name
             textLabel.TextScaled = true
-            textLabel.TextColor3 = Color3.fromRGB(173, 216, 23)
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 230)
             textLabel.Parent = billboard
 
             addedBillboards[part] = billboard
@@ -251,7 +251,7 @@ local Toggle = ESPTab:CreateToggle({
             textLabel.BackgroundTransparency = 1
             textLabel.Text = model.Name
             textLabel.TextScaled = true
-            textLabel.TextColor3 = Color3.fromRGB(173, 216, 23)
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 230)
             textLabel.Parent = billboard
 
             addedBillboards[model] = billboard
@@ -316,7 +316,7 @@ local CandleToggle = ESPTab:CreateToggle({
             textLabel.BackgroundTransparency = 1
             textLabel.Text = candleModel.Name
             textLabel.TextScaled = true
-            textLabel.TextColor3 = Color3.fromRGB(173, 216, 23) -- light purple
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 230)
             textLabel.Parent = billboard
         end
 
@@ -408,7 +408,7 @@ local PouchToggle = ESPTab:CreateToggle({
             textLabel.BackgroundTransparency = 1
             textLabel.Text = pouchModel.Name
             textLabel.TextScaled = true
-            textLabel.TextColor3 = Color3.fromRGB(200, 162, 200) -- light purple
+            textLabel.TextColor3 = Color3.fromRGB(173, 216, 230)
             textLabel.Parent = billboard
         end
 
